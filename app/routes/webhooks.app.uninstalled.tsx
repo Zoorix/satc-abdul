@@ -14,7 +14,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
   // Webhook requests can trigger multiple times and after an app has already been uninstalled.
   // If this webhook already ran, the session may have been deleted previously.
   if (session) {
-    await drizzleDb.delete(sessionModel).where(eq(sessionModel.shop, shop));
+    await drizzleDb(context.cloudflare.env.DATABASE_URL!).delete(sessionModel).where(eq(sessionModel.shop, shop));
   }
 
   return new Response();

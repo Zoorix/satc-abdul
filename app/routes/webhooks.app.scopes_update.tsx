@@ -10,7 +10,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 
     const current = payload.current as string[];    
     if (session) {
-        await drizzleDb.update(sessionModel).set({
+        await drizzleDb(context.cloudflare.env.DATABASE_URL!).update(sessionModel).set({
             scope: current.toString(),
         }).where(eq(sessionModel.id, session.id));
     }
