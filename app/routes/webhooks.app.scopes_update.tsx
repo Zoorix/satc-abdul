@@ -1,6 +1,8 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { shopify } from "../shopify.server";
-import db from "../db.server";
+import { drizzleDb } from "app/db.server";
+import { sessionModel } from "db/schema";
+import { eq } from "drizzle-orm";
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {
     const { payload, session, topic, shop } = await shopify(context).authenticate.webhook(request);
@@ -8,14 +10,9 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 
     const current = payload.current as string[];    
     if (session) {
-        await db(context.cloudflare.env.DATABASE_URL).session.update({   
-            where: {
-                id: session.id
-            },
-            data: {
-                scope: current.toString(),
-            },
-        });
+        await drizzleDb.update(sessionModel).set({
+            scope: current.toString(),
+        }).where(eq(sessionModel.id, session.id));
     }
     return new Response();
 };

@@ -1,6 +1,10 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { shopify } from "../shopify.server";
-import db from "../db.server";
+import { drizzleDb } from "app/db.server";
+import { sessionModel } from "db/schema";
+import { eq } from "drizzle-orm";
+
+
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {
   const { shop, session, topic } = await shopify(context).authenticate.webhook(request);
@@ -10,9 +14,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
   // Webhook requests can trigger multiple times and after an app has already been uninstalled.
   // If this webhook already ran, the session may have been deleted previously.
   if (session) {
-    await db(context.cloudflare.env.DATABASE_URL).session.deleteMany({
-      where: { shop },
-    });
+    await drizzleDb.delete(sessionModel).where(eq(sessionModel.shop, shop));
   }
 
   return new Response();
