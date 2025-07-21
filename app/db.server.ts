@@ -1,23 +1,16 @@
-import { PrismaClient } from "@prisma/client/edge";
-import { withAccelerate } from "@prisma/extension-accelerate";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
 
-// declare global {
-//   var prismaGlobal: PrismaClient;
-// }
+const sql = neon(process.env.DATABASE_URL!);
+export const drizzleDb = drizzle(sql);
 
-// if (process.env.NODE_ENV !== "production") {
-//   if (!global.prismaGlobal) {
-//     global.prismaGlobal = new PrismaClient();
-//   }
-// }
+// Setup for Prisma Accelerate
+// import { PrismaClient } from "@prisma/client/edge";
+// import { withAccelerate } from "@prisma/extension-accelerate";
 
-// const prisma = global.prismaGlobal ?? new PrismaClient();
+// const prisma = (DATABASE_URL: string) =>
+//   new PrismaClient({
+//     datasourceUrl: DATABASE_URL,
+//   }).$extends(withAccelerate());
 
 // export default prisma;
-
-const prisma = (DATABASE_URL: string) =>
-  new PrismaClient({
-    datasourceUrl: DATABASE_URL,
-  }).$extends(withAccelerate());
-
-export default prisma;

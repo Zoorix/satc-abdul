@@ -1,0 +1,31 @@
+import {
+  pgTable,
+  varchar,
+  timestamp,
+  text,
+  integer,
+  uniqueIndex,
+  foreignKey,
+  boolean,
+  bigint,
+  jsonb,
+  primaryKey,
+} from "drizzle-orm/pg-core";
+
+export const sessionModel = pgTable("Session", {
+  id: text().primaryKey().notNull(),
+  shop: text().notNull(),
+  state: text().notNull(),
+  isOnline: boolean().default(false).notNull(),
+  scope: text(),
+  expires: timestamp({ precision: 3, mode: "string" }),
+  accessToken: text(),
+  userId: bigint({ mode: "number" }),
+  accountOwner: boolean().default(false).notNull(),
+  collaborator: boolean().default(false),
+  email: text(),
+  emailVerified: boolean().default(false),
+  firstName: text(),
+  lastName: text(),
+  locale: text(),
+});
