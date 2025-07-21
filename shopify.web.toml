@@ -5,3 +5,6 @@ webhooks_path = "/webhooks/app/uninstalled"
 [commands]
 predev = "npx drizzle-kit migrate"
 dev = "npx drizzle-kit migrate && npm exec remix vite:dev"
+
+[vars]
+DATABASE_URL = "postgresql://neondb_owner:npg_9ZUKJpbEj8FX@ep-wandering-bar-a97n7s3g-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
