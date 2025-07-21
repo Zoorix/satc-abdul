@@ -22,7 +22,7 @@ export default function App() {
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
         <Link to="/app" rel="home">
-          Home
+          Home of Shopify App
         </Link>
         <Link to="/app/additional">Additional page</Link>
       </NavMenu>
