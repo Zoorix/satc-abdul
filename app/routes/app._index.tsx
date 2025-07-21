@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { Form, useNavigation, useActionData } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -13,7 +13,7 @@ import {
   Link,
   InlineStack,
 } from "@shopify/polaris";
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { shopify } from "../shopify.server";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
@@ -92,31 +92,24 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 };
 
 export default function Index() {
-  const fetcher = useFetcher<typeof action>();
+  const navigation = useNavigation();
 
   const shopify = useAppBridge();
+  const actionData = useActionData<typeof action>();
   const isLoading =
-    ["loading", "submitting"].includes(fetcher.state) &&
-    fetcher.formMethod === "POST";
-  const productId = fetcher.data?.product?.id.replace(
-    "gid://shopify/Product/",
-    "",
-  );
+    navigation.state === "submitting" || navigation.state === "loading";
 
   useEffect(() => {
-    if (productId) {
+    if (actionData?.product) {
       shopify.toast.show("Product created");
     }
-  }, [productId, shopify]);
-  const generateProduct = () => fetcher.submit({}, { method: "POST" });
+  }, [actionData, shopify]);
 
   return (
     <Page>
-      <TitleBar title="Remix app template">
-        <button variant="primary" onClick={generateProduct}>
-          Generate a product
-        </button>
-      </TitleBar>
+      
+      <Form method="post" reloadDocument>
+
       <BlockStack gap="500">
         <Layout>
           <Layout.Section>
@@ -169,12 +162,12 @@ export default function Index() {
                   </Text>
                 </BlockStack>
                 <InlineStack gap="300">
-                  <Button loading={isLoading} onClick={generateProduct}>
+                  <Button loading={isLoading} submit>
                     Generate a product
                   </Button>
-                  {fetcher.data?.product && (
+                  {actionData?.product && (
                     <Button
-                      url={`shopify:admin/products/${productId}`}
+                      url={`shopify:admin/products/${actionData.product.id}`}
                       target="_blank"
                       variant="plain"
                     >
@@ -182,7 +175,7 @@ export default function Index() {
                     </Button>
                   )}
                 </InlineStack>
-                {fetcher.data?.product && (
+                {actionData?.product && (
                   <>
                     <Text as="h3" variant="headingMd">
                       {" "}
@@ -198,7 +191,7 @@ export default function Index() {
                     >
                       <pre style={{ margin: 0 }}>
                         <code>
-                          {JSON.stringify(fetcher.data.product, null, 2)}
+                          {JSON.stringify(actionData.product, null, 2)}
                         </code>
                       </pre>
                     </Box>
@@ -216,7 +209,7 @@ export default function Index() {
                     >
                       <pre style={{ margin: 0 }}>
                         <code>
-                          {JSON.stringify(fetcher.data.variant, null, 2)}
+                          {JSON.stringify(actionData.variant, null, 2)}
                         </code>
                       </pre>
                     </Box>
@@ -329,6 +322,8 @@ export default function Index() {
           </Layout.Section>
         </Layout>
       </BlockStack>
+      </Form>
+
     </Page>
   );
 }
