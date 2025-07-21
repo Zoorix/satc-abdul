@@ -19,7 +19,7 @@ export const shopify = (context: AppLoadContext) =>
     appUrl: context.cloudflare.env.SHOPIFY_APP_URL || "",
     authPathPrefix: "/auth",
     sessionStorage: new DrizzleSessionStoragePostgres(
-      drizzleDb,
+      drizzleDb(context.cloudflare.env.DATABASE_URL!),
       sessionModel as any,
     ),
     distribution: AppDistribution.AppStore,
