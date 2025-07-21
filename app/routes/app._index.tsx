@@ -167,7 +167,7 @@ export default function Index() {
                   </Button>
                   {actionData?.product && (
                     <Button
-                      url={`shopify:admin/products/${actionData.product.id}`}
+                      url={`shopify:admin/products/${actionData.product.id.replace("gid://shopify/Product/", "")}`}
                       target="_blank"
                       variant="plain"
                     >
