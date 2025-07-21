@@ -1,0 +1,32 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "02a3104e40b18ae331a6176327e8d4b8"
+name = "satc-abdul"
+handle = "satc-abdul-1"
+application_url = "https://tip-watching-politicians-stroke.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = ["https://tip-watching-politicians-stroke.trycloudflare.com/auth/callback", "https://tip-watching-politicians-stroke.trycloudflare.com/auth/shopify/callback", "https://tip-watching-politicians-stroke.trycloudflare.com/api/auth/callback"]
+
+[pos]
+embedded = false
