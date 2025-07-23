@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 
-import { shopify } from "../../shopify.server";
+import { shopifyData } from "../../shopify.server";
 
 import styles from "./styles.module.css";
 
@@ -13,7 +13,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
-  return { showForm: Boolean(shopify(context).login) };
+  return { showForm: Boolean(shopifyData(context).login) };
 };
 
 export default function App() {

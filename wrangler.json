@@ -20,7 +20,7 @@
       {
         "binding": "HYPERDRIVE",
         "id": "87e5db06365c421da6482fb6d0a8cdf5",
-        "localConnectionString": "postgresql://satc_user:admin%23321@localhost:5432/satc_abdul_dev"
+        "localConnectionString": "postgresql://postgres:admin%23321@localhost:5432/satc_abdul_dev"
       }
     ]
     

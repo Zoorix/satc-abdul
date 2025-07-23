@@ -1,29 +1,30 @@
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "db/schema"; // adjust path if needed
 import type { AppLoadContext } from "@remix-run/cloudflare";
+import type { Env } from "../load-context";
 
-// Accepts Hyperdrive connection string from env/context
-export const drizzleDb = (connectionString: string) => {
-  const sql = neon(connectionString);
+// Accepts env object from context
+export const satcDb = (env: Env) => {
+  const connectionString = env.HYPERDRIVE.connectionString!;
+
+  console.log(
+    "satcDb connectionString =====================================",
+    connectionString,
+  );
+
+  const sql = postgres(connectionString, {
+    max: 1, // Single connection per worker instance
+    idle_timeout: 2, // Short idle timeout
+    connect_timeout: 5, // Quick connect timeout
+    // Hyperdrive handles connection pooling, so we keep this minimal
+  });
   return drizzle(sql, { schema });
 };
 
 // For Remix loaders/actions (using AppLoadContext)
 const db = (context: AppLoadContext) => {
-  // Use Hyperdrive connection string only
-  return drizzleDb(context.cloudflare.env.HYPERDRIVE.connectionString!);
+  return satcDb(context.cloudflare.env);
 };
 
 export default db;
-
-// Setup for Prisma Accelerate
-// import { PrismaClient } from "@prisma/client/edge";
-// import { withAccelerate } from "@prisma/extension-accelerate";
-
-// const prisma = (DATABASE_URL: string) =>
-//   new PrismaClient({
-//     datasourceUrl: DATABASE_URL,
-//   }).$extends(withAccelerate());
-
-// export default prisma;

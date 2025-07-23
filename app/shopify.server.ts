@@ -6,20 +6,21 @@ import {
 } from "@shopify/shopify-app-remix/server";
 import { DrizzleSessionStoragePostgres } from "@shopify/shopify-app-session-storage-drizzle";
 
-import { drizzleDb } from "./db.server";
+import { satcDb } from "./db.server";
 import { sessionModel } from "../db/schema";
 import type { AppLoadContext } from "@remix-run/cloudflare";
+import type { Env } from "../load-context";
 
-export const shopify = (context: AppLoadContext) =>
-  shopifyApp({
-    apiKey: context.cloudflare.env.SHOPIFY_API_KEY,
-    apiSecretKey: context.cloudflare.env.SHOPIFY_API_SECRET || "",
+export const shopifyDataByEnv = (env: Env, request?: Request) => {
+  const shopifyAppData = {
+    apiKey: env.SHOPIFY_API_KEY,
+    apiSecretKey: env.SHOPIFY_API_SECRET || "",
     apiVersion: ApiVersion.October24,
-    scopes: context.cloudflare.env.SCOPES?.split(","),
-    appUrl: context.cloudflare.env.SHOPIFY_APP_URL || "",
+    scopes: env.SCOPES?.split(","),
+    appUrl: env.SHOPIFY_APP_URL || "",
     authPathPrefix: "/auth",
     sessionStorage: new DrizzleSessionStoragePostgres(
-      drizzleDb(context.cloudflare.env.DATABASE_URL!),
+      satcDb(env),
       sessionModel as any,
     ),
     distribution: AppDistribution.AppStore,
@@ -30,19 +31,25 @@ export const shopify = (context: AppLoadContext) =>
     ...(process.env.SHOP_CUSTOM_DOMAIN
       ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
       : {}),
+  };
+
+  return shopifyApp({
+    ...(shopifyAppData as any),
+
+    hooks: {
+      afterAuth: async ({ session }) => {
+        console.log("afterAuth", session.shop);
+        const provShopifyData = shopifyApp(shopifyAppData as any);
+        await provShopifyData.registerWebhooks({
+          session: session as any,
+        });
+      },
+    },
   });
+};
 
-export default shopify;
+export const shopifyData = (context: AppLoadContext, request?: Request) => {
+  return shopifyDataByEnv(context.cloudflare.env, request);
+};
+
 export const apiVersion = ApiVersion.January25;
-
-// export const addDocumentResponseHeaders = (
-//   response: Response,
-//   request: Request,
-// ) => {
-//   return shopify.addDocumentResponseHeaders(response, request);
-// };
-// export const authenticate = shopify.authenticate;
-// export const unauthenticated = shopify.unauthenticated;
-// export const login = shopify.login;
-// export const registerWebhooks = shopify.registerWebhooks;
-// export const sessionStorage = shopify.sessionStorage;
