@@ -1,6 +1,4 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "db/schema"; // adjust path if needed
+import { createDrizzleDb } from "../db"; // adjust path if needed
 import type { AppLoadContext } from "@remix-run/cloudflare";
 import type { Env } from "../load-context";
 
@@ -13,13 +11,7 @@ export const satcDb = (env: Env) => {
     connectionString,
   );
 
-  const sql = postgres(connectionString, {
-    max: 1, // Single connection per worker instance
-    idle_timeout: 2, // Short idle timeout
-    connect_timeout: 5, // Quick connect timeout
-    // Hyperdrive handles connection pooling, so we keep this minimal
-  });
-  return drizzle(sql, { schema });
+  return createDrizzleDb(connectionString);
 };
 
 // For Remix loaders/actions (using AppLoadContext)
