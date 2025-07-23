@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { shopifyData } from "../shopify.server";
-import { drizzleDb } from "app/db.server";
+import { satcDb } from "app/db.server";
 import { sessionModel } from "db/schema";
 import { eq } from "drizzle-orm";
 
@@ -10,7 +10,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 
     const current = payload.current as string[];    
     if (session) {
-        await drizzleDb(context.cloudflare.env).update(sessionModel).set({
+        await satcDb(context.cloudflare.env).update(sessionModel).set({
             scope: current.toString(),
         }).where(eq(sessionModel.id, session.id));
     }
