@@ -6,6 +6,9 @@ type Env = {
   SHOPIFY_APP_URL?: string;
   DATABASE_URL?: string;
   SCOPES?: string;
+  HYPERDRIVE: {
+    connectionString: string;
+  };
 };
 
 type GetLoadContextArgs = {

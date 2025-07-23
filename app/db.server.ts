@@ -3,15 +3,16 @@ import { neon } from "@neondatabase/serverless";
 import * as schema from "db/schema"; // adjust path if needed
 import type { AppLoadContext } from "@remix-run/cloudflare";
 
-// Accepts DATABASE_URL from env/context
-export const drizzleDb = (DATABASE_URL: string) => {
-  const sql = neon(DATABASE_URL);
+// Accepts Hyperdrive connection string from env/context
+export const drizzleDb = (connectionString: string) => {
+  const sql = neon(connectionString);
   return drizzle(sql, { schema });
 };
 
 // For Remix loaders/actions (using AppLoadContext)
 const db = (context: AppLoadContext) => {
-  return drizzleDb(context.cloudflare.env.DATABASE_URL!);
+  // Use Hyperdrive connection string only
+  return drizzleDb(context.cloudflare.env.HYPERDRIVE.connectionString!);
 };
 
 export default db;
